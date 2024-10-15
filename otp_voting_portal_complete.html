@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electronic Voting System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, select, button {
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the Voting Portal</h1>
+
+        <!-- Registration Section -->
+        <div id="registration">
+            <form id="registrationForm">
+                <label for="email">Email:</label>
+                <input type="email" id="email" required placeholder="Enter your email">
+                <button type="submit">Register</button>
+            </form>
+        </div>
+
+        <!-- OTP Section -->
+        <div id="otpSection" class="hidden">
+            <h2>Enter OTP</h2>
+            <form id="otpForm">
+                <input type="text" id="otp" placeholder="Enter OTP" required>
+                <button type="submit">Verify OTP</button>
+            </form>
+        </div>
+
+        <!-- Voting Section -->
+        <div id="votingSection" class="hidden">
+            <h2>Select a Candidate to Vote</h2>
+            <form id="votingForm">
+                <select id="candidate" required>
+                    <option value="Candidate A">Candidate A</option>
+                    <option value="Candidate B">Candidate B</option>
+                    <option value="Candidate C">Candidate C</option>
+                </select>
+                <button type="submit">Submit Vote</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const registrationForm = document.getElementById('registrationForm');
+        const otpForm = document.getElementById('otpForm');
+        const votingForm = document.getElementById('votingForm');
+
+        const registrationSection = document.getElementById('registration');
+        const otpSection = document.getElementById('otpSection');
+        const votingSection = document.getElementById('votingSection');
+
+        // Handle registration and sending OTP
+        registrationForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+
+            // Send OTP request
+            fetch('http://localhost:3000/send-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('OTP has been sent to your email.');
+                    registrationSection.classList.add('hidden');
+                    otpSection.classList.remove('hidden');
+                } else {
+                    alert('Failed to send OTP.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error in sending OTP.');
+            });
+        });
+
+        // Handle OTP verification
+        otpForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;  // Same email used for OTP
+            const otp = document.getElementById('otp').value;
+
+            // Verify OTP request
+            fetch('http://localhost:3000/verify-otp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email, otp: otp })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('OTP verified successfully!');
+                    otpSection.classList.add('hidden');
+                    votingSection.classList.remove('hidden');
+                } else {
+                    alert('Invalid OTP.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error in verifying OTP.');
+            });
+        });
+
+        // Handle vote submission
+        votingForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const candidate = document.getElementById('candidate').value;
+
+            // Submit vote request
+            fetch('http://localhost:3000/submit-vote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ candidate: candidate })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Your vote has been submitted successfully.');
+                } else {
+                    alert('Failed to submit vote.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error in submitting vote.');
+            });
+        });
+    </script>
+</body>
+</html>
