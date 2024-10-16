@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h2>Admin Dashboard</h2>
+    <h3>Total Votes: {{ votes|length }}</h3>
+    <h4>Votes:</h4>
+    <ul>
+        {% for user, vote in votes.items() %}
+        <li>{{ user }} voted for {{ vote }}</li>
+        {% endfor %}
+    </ul>
+    <h4>Users Registered:</h4>
+    <ul>
+        {% for user in users %}
+        <li>{{ user }} - Has Voted: {{ users[user]['has_voted'] }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
